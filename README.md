@@ -1,7 +1,7 @@
-Gregwar's FormBundle
+NewEntityFormBundle
 =====================
 
-`GregwarFormBundle` provides the form type "hidden_entity"
+`NewEntityFormBundle` provides the form type "hidden_entity"
 
 Installation
 ============
@@ -9,7 +9,7 @@ Installation
 To install `GregwarFormBundle`, first adds it to your deps and clone it in your
 vendor directory, then add the namespace to your `app/autoload.php` file:
 
-      'Gregwar' => __DIR__.'/../vendor/gregwar-form/bundle/',
+      'NewEntityFormBundle' => __DIR__.'/../vendor/bundles/',
 
 And registers the bundle in your `app/AppKernel.php`:
 
@@ -18,14 +18,11 @@ And registers the bundle in your `app/AppKernel.php`:
     {
         $bundles = array(
             ...
-            new Gregwar\FormBundle\GregwarFormBundle(),
+            new NewEntityFormBundle\FormBundle\NewEntityFormBundle(),
             ...
         );
     ...
 
-Adds the following configuration to your `app/config/config.yml`:
-
-    gregwar_form: ~
 
 Usage
 =====
@@ -36,17 +33,16 @@ javascripts or any UI logics to fill it programmatically.
 The usage look like the entity field type one, except that the query builder have
 to returns one unique result. One full example :
 
-    $builder
-        ->add('city', 'hidden_entity', array(
+    $builder->add('posts_tags', 'hidden_entity', array(
+            'multiple' => true,
             'required' => false,
-            'class' => 'Project\Entity\City',
+            'class' => 'WSL\BackendBundle\Entity\Tag',
             'query_builder' => function(EntityRepository $repo, $id) {
-                return $repo->createQueryBuilder('c')
-                    ->where('c.id = :id AND c.available = 1')
-                    ->setParameter('id', $id)
+                return $repo->createQueryBuilder('t')
+                    ->where('t.tag_id = :id')
+                    ->setParameter('id', $id);
             }
-        ))
-        ;
+        ));
 
 Note that if you don't provide any query builder, `->find($id)` will be used.
 
