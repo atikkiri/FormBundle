@@ -1,11 +1,13 @@
 <?php
 
-namespace Gregwar\FormBundle\Type;
+namespace NewEntityFormBundle\FormBundle\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 
-use Gregwar\FormBundle\DataTransformer\EntityToIdTransformer;
+use NewEntityFormBundle\FormBundle\DataTransformer\EntityToIdTransformer;
+use NewEntityFormBundle\FormBundle\DataTransformer\EntitiesToArrayTransformer;
 
 /**
  * Hidden Entity type
@@ -24,7 +26,13 @@ class HiddenEntityType extends AbstractType
 
     public function buildForm(FormBuilder $builder, array $options)
     {
-        $builder->prependClientTransformer(new EntityToIdTransformer($this->em, $options['class'], $options['query_builder']));
+        if (isset($options['multiple']) && $options['multiple']) {
+            $builder
+                ->addEventSubscriber(new MergeCollectionListener())
+                ->prependClientTransformer(new EntitiesToArrayTransformer($this->em, $options['class'], $options['query_builder']));
+        } else {
+            $builder->prependClientTransformer(new EntityToIdTransformer($this->em, $options['class'], $options['query_builder']));
+        }
     }
 
     public function getDefaultOptions(array $options)
