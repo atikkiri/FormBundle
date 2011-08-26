@@ -5,23 +5,24 @@ namespace NewEntityFormBundle\FormBundle\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Form\Exception\FormException;
 
-use NewEntityFormBundle\FormBundle\DataTransformer\EntityToIdTransformer;
-use NewEntityFormBundle\FormBundle\DataTransformer\EntitiesToArrayTransformer;
+use Gregwar\FormBundle\DataTransformer\EntityToIdTransformer;
+use Gregwar\FormBundle\DataTransformer\EntitiesToArrayTransformer;
 
 /**
- * Hidden Entity type
+ * Entity identitifer
  *
  * @author Gregwar <g.passault@gmail.com>
  */
-class HiddenEntityType extends AbstractType
+class EntityIdType extends AbstractType
 {
-    protected $doctrine = null;
-    protected $em = null;
+    protected $registry;
 
-    public function __construct($doctrine)
+    public function __construct(RegistryInterface $registry)
     {
-        $this->doctrine = $doctrine;
+        $this->registry = $registry;
     }
 
     public function buildForm(FormBuilder $builder, array $options)
@@ -33,6 +34,13 @@ class HiddenEntityType extends AbstractType
         } else {
             $builder->prependClientTransformer(new EntityToIdTransformer($this->em, $options['class'], $options['query_builder']));
         }
+
+        $builder->prependClientTransformer(new OneEntityToIdTransformer(
+            $this->registry->getEntityManager($options['em']),
+            $options['class'], 
+            $options['property'],
+            $options['query_builder']
+        ));
     }
 
     public function getDefaultOptions(array $options)
@@ -45,12 +53,11 @@ class HiddenEntityType extends AbstractType
             'type'              => 'hidden',
             'hidden'            => true,
         );
+
         $options = array_replace($defaultOptions, $options);
 
-        $this->em = $options['em'] ?: $this->doctrine->getEntityManager();
-
         if (null === $options['class']) {
-            throw new \RunTimeException('You must provide a class option for the hidden entity field');
+            throw new FormException('You must provide a class option for the entity identifier field');
         }
 
         return $options;
@@ -63,6 +70,6 @@ class HiddenEntityType extends AbstractType
 
     public function getName()
     {
-        return 'hidden_entity';
+        return 'entity_id';
     }
 }
