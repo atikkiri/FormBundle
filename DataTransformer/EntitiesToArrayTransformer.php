@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NewEntityFormBundle\FormBundle\DataTransformer;
+namespace GregwarFormBundle\FormBundle\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\FormException;

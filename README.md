@@ -1,4 +1,4 @@
-NewEntityFormBundle
+GregwarFormBundle
 =====================
 
 `GregwarFormBundle` provides the form type "entity_id"
