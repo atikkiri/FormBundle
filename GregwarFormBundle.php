@@ -1,6 +1,6 @@
 <?php
 
-namespace GregwarFormBundle\FormBundle;
+namespace Gregwar\FormBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

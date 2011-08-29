@@ -1,6 +1,6 @@
 <?php
 
-namespace GregwarFormBundle\FormBundle\DataTransformer;
+namespace Gregwar\FormBundle\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\FormException;

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace GregwarFormBundle\FormBundle\DataTransformer;
+namespace Gregwar\FormBundle\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\FormException;
@@ -17,6 +17,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Doctrine\ORM\EntityManager;
+use Symfony\Component\Form\Util\PropertyPath;
 
 use Doctrine\ORM\NoResultException;
 
@@ -31,9 +33,9 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
 
     private $unitOfWork;
 
-    public function __construct($em, $class, $queryBuilder)
+    public function __construct(EntityManager $em, $class, $property, $queryBuilder)
     {
-        if (!(null === $queryBuilder || $queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
+        if (null !== $queryBuilder && ! $queryBuilder instanceof \Closure) {
             throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
         }
 
@@ -45,6 +47,10 @@ class EntitiesToArrayTransformer implements DataTransformerInterface
         $this->unitOfWork = $this->em->getUnitOfWork();
         $this->class = $class;
         $this->queryBuilder = $queryBuilder;
+
+        if ($property) {
+            $this->property = $property;
+        }
     }
 
     /**

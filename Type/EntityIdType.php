@@ -1,6 +1,6 @@
 <?php
 
-namespace GregwarFormBundle\FormBundle\Type;
+namespace Gregwar\FormBundle\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilder;
@@ -8,7 +8,7 @@ use Symfony\Bridge\Doctrine\Form\EventListener\MergeCollectionListener;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Form\Exception\FormException;
 
-use Gregwar\FormBundle\DataTransformer\EntityToIdTransformer;
+use Gregwar\FormBundle\DataTransformer\OneEntityToIdTransformer;
 use Gregwar\FormBundle\DataTransformer\EntitiesToArrayTransformer;
 
 /**
@@ -30,17 +30,21 @@ class EntityIdType extends AbstractType
         if (isset($options['multiple']) && $options['multiple']) {
             $builder
                 ->addEventSubscriber(new MergeCollectionListener())
-                ->prependClientTransformer(new EntitiesToArrayTransformer($this->em, $options['class'], $options['query_builder']));
+                ->prependClientTransformer(new EntitiesToArrayTransformer(
+                $this->registry->getEntityManager($options['em']),
+                $options['class'],
+                $options['property'],
+                $options['query_builder']
+            ));
         } else {
-            $builder->prependClientTransformer(new EntityToIdTransformer($this->em, $options['class'], $options['query_builder']));
+            $builder->prependClientTransformer(new OneEntityToIdTransformer(
+                $this->registry->getEntityManager($options['em']),
+                $options['class'], 
+                $options['property'],
+                $options['query_builder']
+            ));
         }
 
-        $builder->prependClientTransformer(new OneEntityToIdTransformer(
-            $this->registry->getEntityManager($options['em']),
-            $options['class'], 
-            $options['property'],
-            $options['query_builder']
-        ));
     }
 
     public function getDefaultOptions(array $options)
